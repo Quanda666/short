@@ -1,464 +1,484 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" href="asset/img/favicon.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>星漫旅站 - URL缩短服务</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL 缩短器 - 创建短链</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    html,
-    body {
-      height: 100%;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-    }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
 
-    .header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-      padding: 20px 0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      flex-shrink: 0;
-    }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
 
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+        .subtitle {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
 
-    .logo {
-      font-size: 24px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    .header-links a {
-      color: #666;
-      text-decoration: none;
-      margin-left: 30px;
-      transition: color 0.3s ease;
-    }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
 
-    .header-links a:hover {
-      color: #667eea;
-    }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
 
-    .container-main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      align-items: center;
-      flex: 1;
-      width: 100%;
-    }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
 
-    .hero-section {
-      color: white;
-    }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
 
-    .hero-section h1 {
-      font-size: 48px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      line-height: 1.2;
-    }
+        .options-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
 
-    .hero-section p {
-      font-size: 18px;
-      opacity: 0.9;
-      margin-bottom: 15px;
-      line-height: 1.6;
-    }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
 
-    .features {
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
 
-    .feature-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      opacity: 0.95;
-    }
+        .checkbox-group label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
 
-    .feature-item:before {
-      content: "✓";
-      font-size: 20px;
-      font-weight: bold;
-      color: #4ade80;
-      flex-shrink: 0;
-    }
+        .hidden-field {
+            display: none;
+        }
 
-    .form-section {
-      background: rgba(255, 255, 255, 0.98);
-      border-radius: 16px;
-      padding: 40px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-    }
+        .hidden-field.show {
+            display: block;
+        }
 
-    .form-title {
-      font-size: 28px;
-      font-weight: 700;
-      color: #333;
-      margin-bottom: 30px;
-      text-align: center;
-    }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
 
-    .form-group {
-      margin-bottom: 20px;
-    }
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-    .form-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: #555;
-      margin-bottom: 8px;
-    }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
 
-    input,
-    select {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 14px;
-      transition: all 0.3s ease;
-      font-family: inherit;
-    }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
 
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
 
-    input::placeholder {
-      color: #999;
-    }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
 
-    .details-toggle {
-      margin: 25px 0;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      overflow: hidden;
-    }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
 
-    .details-toggle summary {
-      padding: 14px 16px;
-      cursor: pointer;
-      font-weight: 600;
-      color: #555;
-      background-color: #f9f9f9;
-      display: flex;
-      align-items: center;
-      transition: background-color 0.3s ease;
-    }
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
 
-    .details-toggle summary:hover {
-      background-color: #f0f0f0;
-    }
+        .alert.show {
+            display: block;
+        }
 
-    .details-toggle[open] summary {
-      background-color: #f5f5f5;
-      border-bottom: 1px solid #e0e0e0;
-    }
+        .alert.error {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #c33;
+        }
 
-    .details-content {
-      padding: 20px 16px;
-      background-color: #fafafa;
-    }
+        .alert.success {
+            background: #efe;
+            color: #3c3;
+            border-left: 4px solid #3c3;
+        }
 
-    .submit-btn {
-      width: 100%;
-      padding: 14px 24px;
-      margin-top: 10px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    }
+        .result-box {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
 
-    .submit-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-    }
+        .result-box.show {
+            display: block;
+        }
 
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+        .result-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
 
-    .alert {
-      padding: 14px 16px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        .result-row:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
 
-    .alert:before {
-      font-size: 18px;
-      flex-shrink: 0;
-    }
+        .result-label {
+            color: #999;
+            font-size: 13px;
+            font-weight: 600;
+        }
 
-    .alert.success {
-      background-color: #d1fae5;
-      color: #047857;
-      border-left: 4px solid #10b981;
-    }
+        .result-value {
+            color: #333;
+            font-weight: 600;
+            word-break: break-all;
+            max-width: 60%;
+            text-align: right;
+        }
 
-    .alert.success:before {
-      content: "✓";
-    }
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
 
-    .alert.error {
-      background-color: #fee2e2;
-      color: #b91c1c;
-      border-left: 4px solid #ef4444;
-    }
+        .copy-btn:hover {
+            background: #5568d3;
+        }
 
-    .alert.error:before {
-      content: "✕";
-    }
+        .copy-btn.copied {
+            background: #3c3;
+        }
 
-    footer {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(0, 0, 0, 0.08);
-      padding: 30px 20px;
-      text-align: center;
-      flex-shrink: 0;
-    }
+        .hint {
+            color: #999;
+            font-size: 12px;
+            margin-top: 6px;
+        }
 
-    footer a {
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.3s ease;
-    }
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
 
-    footer a:hover {
-      color: #764ba2;
-    }
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
 
-    @media (max-width: 768px) {
-      .container-main {
-        grid-template-columns: 1fr;
-        padding: 20px 20px;
-        gap: 30px;
-      }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-      .hero-section h1 {
-        font-size: 36px;
-      }
-
-      .hero-section {
-        text-align: center;
-      }
-
-      .form-section {
-        padding: 30px 20px;
-      }
-
-      .header-links {
-        display: none;
-      }
-    }
-
-    @keyframes fadeInScale {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
-    }
-
-    .form-section {
-      animation: fadeInScale 0.5s ease-out;
-    }
-  </style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-
 <body>
-  <!-- 页面头部 -->
-  <header class="header">
-    <div class="header-content">
-      <div class="logo">星漫旅站</div>
-      <div class="header-links">
-        <a href="https://blog.110995.xyz/">博客</a>
-        <a href="https://nav.12388888.xyz/">书签</a>
-      </div>
-    </div>
-  </header>
+    <div class="container">
+        <h1>⚡ 短链生成器</h1>
+        <p class="subtitle">使用密码保护和过期时间创建安全的短链接</p>
 
-  <!-- 主容器 -->
-  <div class="container-main">
-    <!-- 左侧英雄部分 -->
-    <div class="hero-section">
-      <h1>快速生成短链接</h1>
-      <p>将您的长URL转换为简短易记的链接，支持自定义设置。</p>
-      
-      <div class="features">
-        <div class="feature-item">瞬间生成 - 一键转换您的链接</div>
-        <div class="feature-item">自定义短链 - 创建个性化的链接名称</div>
-        <div class="feature-item">实时复制 - 自动复制到剪贴板</div>
-        <div class="feature-item">简单易用 - 无需复杂配置</div>
-        <div class="feature-item">安全可靠 - 稳定的链接服务</div>
-      </div>
-    </div>
+        <div id="alert" class="alert"></div>
 
-    <!-- 右侧表单部分 -->
-    <div class="form-section" x-data="app" x-cloak>
-      <div class="form-title">生成短链接</div>
+        <form id="shortenerForm">
+            <!-- URL 输入 -->
+            <div class="form-group">
+                <label for="url">📎 目标 URL <span style="color: #c33;">*</span></label>
+                <textarea id="url" placeholder="https://example.com" required></textarea>
+                <div class="hint">输入要缩短的长链接</div>
+            </div>
 
-      <!-- 消息提示 -->
-      <div x-show.transition.opacity="alert" :class="alert?.type" class="alert" x-text="alert?.message"></div>
+            <!-- Slug 输入 -->
+            <div class="form-group">
+                <label for="slug">🏷️ 自定义短链 (可选)</label>
+                <input type="text" id="slug" placeholder="自定义短链 (2-10 字符)">
+                <div class="hint">不填则自动生成随机短链</div>
+            </div>
 
-      <!-- URL输入框 -->
-      <div class="form-group">
-        <label class="form-label">原始链接 *</label>
-        <input 
-          type="text"
-          placeholder="输入要缩短的网址 (例如: https://example.com/very/long/url)" 
-          x-model="url" 
-          x-ref="url"
-        />
-      </div>
+            <!-- 密码保护 -->
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="enablePassword">
+                    <label for="enablePassword">🔐 启用密码保护</label>
+                </div>
+                <div id="passwordField" class="hidden-field">
+                    <input type="password" id="password" placeholder="输入至少 4 个字符的密码">
+                    <div class="hint">访问此链接需要输入密码</div>
+                </div>
+            </div>
 
-      <!-- 高级设置 -->
-      <details class="details-toggle">
-        <summary>⚙️ 自定义设置</summary>
-        <div class="details-content">
-          <div class="form-group">
-            <label class="form-label">自定义短链接 (可选)</label>
-            <input 
-              type="text"
-              placeholder="自定义短链接名称"
-              x-model="slug"
-            />
-          </div>
+            <!-- 过期时间 -->
+            <div class="form-group">
+                <label for="expireType">⏰ 过期时间</label>
+                <select id="expireType">
+                    <option value="never">永不过期</option>
+                    <option value="hour">1 小时后过期</option>
+                    <option value="day">1 天后过期</option>
+                    <option value="week">1 周后过期</option>
+                    <option value="month">1 月后过期</option>
+                    <option value="custom">自定义</option>
+                </select>
+                <div class="hint">选择链接的有效期</div>
+            </div>
+
+            <!-- 自定义过期时间 -->
+            <div id="customExpireField" class="hidden-field form-group">
+                <label for="customMinutes">自定义过期时间 (分钟)</label>
+                <input type="number" id="customMinutes" placeholder="例如: 120" min="1" max="525600">
+                <div class="hint">输入链接的有效时间（分钟）</div>
+            </div>
+
+            <!-- 按钮 -->
+            <div class="button-group">
+                <button type="submit" class="btn-primary">
+                    <span id="submitText">📌 生成短链</span>
+                    <div id="loading" class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+                <button type="reset" class="btn-secondary">🔄 重置</button>
+            </div>
+        </form>
+
+        <!-- 结果显示 -->
+        <div id="resultBox" class="result-box">
+            <div class="result-row">
+                <span class="result-label">短链地址</span>
+                <div>
+                    <span class="result-value" id="resultLink"></span>
+                    <button type="button" class="copy-btn" onclick="copyToClipboard(document.getElementById('resultLink').textContent)">复制</button>
+                </div>
+            </div>
+            <div class="result-row">
+                <span class="result-label">短链标识</span>
+                <span class="result-value" id="resultSlug"></span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">密码保护</span>
+                <span class="result-value" id="resultPassword">-</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">过期时间</span>
+                <span class="result-value" id="resultExpire">-</span>
+            </div>
         </div>
-      </details>
-
-      <!-- 提交按钮 -->
-      <button 
-        :class="{ 'opacity-50 cursor-not-allowed': loading || isValidated() }" 
-        :disabled="loading || isValidated()" 
-        @click="submit($refs, $nextTick)"
-        class="submit-btn"
-      >
-        <span x-show="!loading">生成短链接</span>
-        <span x-show="loading">正在生成中...</span>
-      </button>
     </div>
-  </div>
 
-  <!-- 页脚 -->
-  <footer>
-    <p>© 2025 <a href="https://page.110995.xyz/">星漫旅站</a> · 快速、安全、可靠的URL缩短服务</p>
-  </footer>
+    <script>
+        const form = document.getElementById('shortenerForm');
+        const passwordCheckbox = document.getElementById('enablePassword');
+        const passwordField = document.getElementById('passwordField');
+        const expireTypeSelect = document.getElementById('expireType');
+        const customExpireField = document.getElementById('customExpireField');
+        const alertDiv = document.getElementById('alert');
+        const resultBox = document.getElementById('resultBox');
 
-  <script src="asset/js/alpine.js"></script>
-  <script>
-    const app = {
-      url: '',
-      slug: '',
-      alert: null,
-      loading: false,
-      isValidated() {
-        return !/^https?:\/\/.{3,}/.test(this.url)
-      },
-      submit($refs, $nextTick) {
-        if (!this.url) {
-          this.alert = { type: 'error', message: '缺少必需的参数：url。' }
-          return
-        }
+        // 切换密码字段
+        passwordCheckbox.addEventListener('change', () => {
+            passwordField.classList.toggle('show', passwordCheckbox.checked);
+        });
 
-        if (this.isValidated()) {
-          this.alert = { type: 'error', message: '非法格式：url。' }
-          return
-        }
+        // 切换自定义过期时间字段
+        expireTypeSelect.addEventListener('change', () => {
+            customExpireField.classList.toggle('show', expireTypeSelect.value === 'custom');
+        });
 
-        this.alert = null
-        this.loading = true
+        // 表单提交
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await createShortLink();
+        });
 
-        const body = { 
-          url: this.url, 
-          slug: this.slug
-        }
+        async function createShortLink() {
+            const url = document.getElementById('url').value.trim();
+            const slug = document.getElementById('slug').value.trim() || undefined;
+            const password = passwordCheckbox.checked ? document.getElementById('password').value : undefined;
+            const expireType = document.getElementById('expireType').value;
+            const customMinutes = expireType === 'custom' ? parseInt(document.getElementById('customMinutes').value) : 0;
 
-        fetch('/create', {
-          method: 'post',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(body)
-        })
-          .then(res => res.json())
-          .then(res => {
-            this.loading = false
-            if (res.message) {
-              this.alert = { type: 'error', message: res.message }
-              return
+            // 验证
+            if (!url) {
+                showAlert('请输入目标 URL', 'error');
+                return;
             }
 
-            this.url = res.link
+            if (password && password.length < 4) {
+                showAlert('密码至少需要 4 个字符', 'error');
+                return;
+            }
 
-            $nextTick(() => {
-              $refs.url.select()
-              this.alert = { type: 'success', message: `链接 ${document.execCommand('Copy') ? '复制' : '生成'} 成功！` }
-            })
-          })
-          .catch(e => {
-            this.alert = { type: 'error', message: e.message }
-            this.loading = false
-          })
-      }
-    }
-  </script>
+            if (expireType === 'custom' && (!customMinutes || customMinutes < 1)) {
+                showAlert('请输入有效的自定义过期时间', 'error');
+                return;
+            }
+
+            // 显示加载状态
+            showLoading(true);
+            resultBox.classList.remove('show');
+
+            try {
+                const payload = {
+                    url,
+                    ...(slug && { slug }),
+                    ...(password && { password }),
+                    expireType,
+                    ...(expireType === 'custom' && { customMinutes })
+                };
+
+                const response = await fetch('/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('✅ 短链生成成功！', 'success');
+                    displayResult(data);
+                } else {
+                    showAlert(data.message || '生成失败，请重试', 'error');
+                }
+            } catch (error) {
+                showAlert('网络错误: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayResult(data) {
+            document.getElementById('resultLink').textContent = data.link;
+            document.getElementById('resultSlug').textContent = data.slug;
+            document.getElementById('resultPassword').textContent = data.isPasswordProtected ? '✅ 已保护' : '❌ 无保护';
+            document.getElementById('resultExpire').textContent = data.expireTime || '永不过期';
+            resultBox.classList.add('show');
+        }
+
+        function showAlert(message, type) {
+            alertDiv.textContent = message;
+            alertDiv.className = `alert show ${type}`;
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const submitText = document.getElementById('submitText');
+            if (show) {
+                loading.style.display = 'block';
+                submitText.style.display = 'none';
+            } else {
+                loading.style.display = 'none';
+                submitText.style.display = 'inline';
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const original = btn.textContent;
+                btn.textContent = '✅ 已复制';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = original;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
 </body>
-
 </html>
