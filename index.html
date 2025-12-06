@@ -331,14 +331,14 @@
     <!-- 左侧英雄部分 -->
     <div class="hero-section">
       <h1>快速生成短链接</h1>
-      <p>将您的长URL转换为简短易记的链接，支持自定义设置和访问控制。</p>
+      <p>将您的长URL转换为简短易记的链接，支持自定义设置。</p>
       
       <div class="features">
         <div class="feature-item">瞬间生成 - 一键转换您的链接</div>
         <div class="feature-item">自定义短链 - 创建个性化的链接名称</div>
-        <div class="feature-item">设置过期 - 控制链接的有效期限</div>
-        <div class="feature-item">密码保护 - 保护您的链接安全</div>
         <div class="feature-item">实时复制 - 自动复制到剪贴板</div>
+        <div class="feature-item">简单易用 - 无需复杂配置</div>
+        <div class="feature-item">安全可靠 - 稳定的链接服务</div>
       </div>
     </div>
 
@@ -347,7 +347,7 @@
       <div class="form-title">生成短链接</div>
 
       <!-- 消息提示 -->
-      <div x-show.transition.opacity="alert" :class="alert?.type" class="alert"></div>
+      <div x-show.transition.opacity="alert" :class="alert?.type" class="alert" x-text="alert?.message"></div>
 
       <!-- URL输入框 -->
       <div class="form-group">
@@ -360,39 +360,17 @@
         />
       </div>
 
-      <!-- 访问密码 -->
-      <div class="form-group">
-        <label class="form-label">访问密码 *</label>
-        <input 
-          type="password" 
-          placeholder="请输入访问密码"
-          x-model="password"
-        />
-      </div>
-
       <!-- 高级设置 -->
       <details class="details-toggle">
-        <summary>⚙️ 高级设置</summary>
+        <summary>⚙️ 自定义设置</summary>
         <div class="details-content">
           <div class="form-group">
             <label class="form-label">自定义短链接 (可选)</label>
             <input 
               type="text"
-              placeholder="自定义短链接名称 (仅限字母、数字、下划线)"
+              placeholder="自定义短链接名称"
               x-model="slug"
             />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">过期时间 (可选)</label>
-            <select x-model="expiry">
-              <option value="">永不过期</option>
-              <option value="5m">5 分钟</option>
-              <option value="1h">1 小时</option>
-              <option value="12h">12 小时</option>
-              <option value="1d">1 天</option>
-              <option value="7d">1 周</option>
-            </select>
           </div>
         </div>
       </details>
@@ -420,8 +398,6 @@
     const app = {
       url: '',
       slug: '',
-      expiry: '',
-      password: '',
       alert: null,
       loading: false,
       isValidated() {
@@ -430,11 +406,6 @@
       submit($refs, $nextTick) {
         if (!this.url) {
           this.alert = { type: 'error', message: '缺少必需的参数：url。' }
-          return
-        }
-        
-        if (!this.password) {
-          this.alert = { type: 'error', message: '请输入访问密码。' }
           return
         }
 
@@ -448,9 +419,7 @@
 
         const body = { 
           url: this.url, 
-          slug: this.slug, 
-          expiry: this.expiry,
-          password: this.password 
+          slug: this.slug
         }
 
         fetch('/create', {
