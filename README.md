@@ -2,7 +2,7 @@
 
 一个使用 Cloudflare Pages 创建的 URL 缩短器
 
-*Demo* : [https://short-3ud.pages.dev/](https://short-3ud.pages.dev/)
+*Demo* : [https://oooo.vvvv.ee/](https://oooo.vvvv.ee/)
 
 
 ### 利用Tencent EdgeOne Pages 部署
@@ -46,6 +46,39 @@ CREATE TABLE IF NOT EXISTS logs (
   `create_time` DATE
 );
 
+```
+####新增功能
+🔐 访问密码保护
+可选的 4+ 字符密码
+漂亮的密码输入表单
+密码验证逻辑
+⏰ 链接过期管理
+永不过期（默认）
+1 小时/1 天/1 周/1 月 自动预设
+自定义过期时间（分钟）
+🔗 组合使用
+密码 + 过期时间
+独立使用任一功能
+完全向后兼容
+####具体操作：
+进入 Cloudflare D1 控制台，执行 01_database_migration.sql 中的 SQL，要分开执行；
+```sql
+ALTER TABLE links ADD COLUMN password TEXT DEFAULT NULL;
+ALTER TABLE links ADD COLUMN expire_type TEXT DEFAULT 'never';
+ALTER TABLE links ADD COLUMN expire_time DATETIME DEFAULT NULL;
+ALTER TABLE links ADD COLUMN is_password_protected INT DEFAULT 0;
+```
+```sql
+CREATE INDEX idx_expire_time ON links(expire_time);
+```
+```sql
+CREATE INDEX idx_slug_with_password ON links(slug, password);
+```
+```sql
+-- 过期时间索引
+CREATE INDEX IF NOT EXISTS idx_expire_time ON links(expire_time);
+-- 短码+密码复合索引
+CREATE INDEX IF NOT EXISTS idx_slug_with_password ON links(slug, password);
 ```
 8. 选择部署完成short项目，前往后台依次点击`设置`->`函数`->`D1 数据库绑定`->`编辑绑定`->变量名称填写：`DB` 命名空间 `选择你提前创建好的D1` 数据库绑定
 
