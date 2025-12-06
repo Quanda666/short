@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS logs (
 );
 
 ```
-####新增功能
+新增功能
 🔐 访问密码保护
 可选的 4+ 字符密码
 漂亮的密码输入表单
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS logs (
 密码 + 过期时间
 独立使用任一功能
 完全向后兼容
-####具体操作：
+具体操作：
 进入 Cloudflare D1 控制台，执行 01_database_migration.sql 中的 SQL，要分开执行；
 ```sql
 ALTER TABLE links ADD COLUMN password TEXT DEFAULT NULL;
