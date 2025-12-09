@@ -196,7 +196,6 @@ export async function onRequestPost(context) {
                 isPasswordProtected: isPasswordProtected === 1,
                 expireType,
                 expireTime: expireTime ? new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai' }).format(new Date(expireTime)) : 'Never'
-
             },
             { headers: corsHeaders, status: 200 }
         );
