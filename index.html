@@ -69,31 +69,6 @@
     .copy-btn:hover { background: #38a169; }
     .copy-btn.copied { background: #2f855a; }
     @media (max-width: 768px) { body { padding: 1rem; } h1 { font-size: 2rem; } }
-
-    /* 复制提示样式 */
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #4CAF50;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transform: translateX(400px);
-      transition: all 0.3s ease;
-      z-index: 10000;
-      font-weight: 500;
-    }
-
-    .toast.show {
-      transform: translateX(0);
-    }
-
-    .copy-btn.copied {
-      background: #4CAF50 !important;
-      color: white;
-    }
   </style>
 </head>
 <body>
@@ -105,7 +80,7 @@
         <input type="url" id="url" placeholder="https://example.com" required>
       </div>
       <div class="form-group">
-        <label for="slug">🏷️自定义短链标识 (可选)</label>
+        <label for="slug">📎自定义短链标识 (可选)</label>
         <input type="text" id="slug" placeholder="请输入2~10位字符哦！" maxlength="10">
       </div>
       <div class="checkbox-group">
@@ -157,7 +132,7 @@
         <span class="result-label">过期时间 (中国时间)</span>
         <span class="result-value" id="resultExpire">-</span>
       </div>
-      <button class="copy-btn" id="copyBtn">📋 复制短链接</button>
+      <button class="copy-btn" onclick="copyToClipboard(document.getElementById('resultLink').textContent)">📋 复制短链接</button>
     </div>
   </div>
 
@@ -170,8 +145,6 @@
     const alertDiv = document.getElementById('alert');
     const resultModal = document.getElementById('resultModal');
     const resultLink = document.getElementById('resultLink');
-    const copyBtn = document.getElementById('copyBtn');
-    const toast = document.getElementById('toast');
 
     // 新增：短链接点击事件 - 新标签页打开
     resultLink.addEventListener('click', function() {
@@ -186,7 +159,6 @@
     expireTypeSelect.addEventListener('change', () => { customExpireField.classList.toggle('show', expireTypeSelect.value === 'custom'); });
 
     form.addEventListener('submit', async (e) => { e.preventDefault(); await createShortLink(); });
-    copyBtn.addEventListener('click', copyToClipboard);
 
     async function createShortLink() {
       const url = document.getElementById('url').value.trim();
@@ -226,47 +198,18 @@
       if (show) { loading.style.display = 'inline'; submitText.style.display = 'none'; } else { loading.style.display = 'none'; submitText.style.display = 'inline'; }
     }
 
-    async function copyToClipboard() {
-      try {
-        await navigator.clipboard.writeText(resultLink.textContent);
-        showToast();
-        copyBtn.textContent = '✅ 已复制!';
-        copyBtn.classList.add('copied');
-        setTimeout(() => {
-          copyBtn.textContent = '📋 复制短链接';
-          copyBtn.classList.remove('copied');
-        }, 2000);
-      } catch (err) {
-        fallbackCopyTextToClipboard(resultLink.textContent);
-      }
-    }
-
-    function fallbackCopyTextToClipboard(text) {
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        showToast();
-      } catch (err) {
-        console.error('复制失败:', err);
-      }
-      document.body.removeChildChild(textArea);
-    }
-
-    function showToast() {
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 1500);
+    // 复制成功后自动关闭弹窗
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target; const original = btn.textContent;
+        btn.textContent = '✅ 已复制!'; btn.classList.add('copied');
+        // 关闭结果弹窗
+        resultModal.classList.remove('show');
+        setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
+      });
     }
 
     resultModal.addEventListener('click', function(e) { if (e.target === resultModal) resultModal.classList.remove('show'); });
   </script>
-
-  <!-- 复制提示弹窗 -->
-  <div class="toast" id="toast">✅ 已复制!</div>
 </body>
 </html>
