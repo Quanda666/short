@@ -199,27 +199,16 @@
     }
 
     // 复制成功后自动关闭弹窗
-function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = event.target; 
-    const original = btn.textContent;
-    
-    // 显示复制成功提示
-    btn.textContent = '✅ 已复制!'; 
-    btn.classList.add('copied');
-    // 自动关闭结果弹窗
-    resultModal.classList.remove('show');
-    
-    // 2秒后恢复按钮原始状态
-    setTimeout(() => { 
-      btn.textContent = original; 
-      btn.classList.remove('copied'); 
-    }, 2000);
-  }).catch(err => {
-    // 增加复制失败的处理
-    showAlert('复制失败: ' + err.message, 'error');
-  });
-}
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target; const original = btn.textContent;
+        btn.textContent = '✅ 已复制!'; btn.classList.add('copied');
+        // 关闭结果弹窗
+        resultModal.classList.remove('show');
+        setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
     resultModal.addEventListener('click', function(e) { if (e.target === resultModal) resultModal.classList.remove('show'); });
   </script>
 </body>
