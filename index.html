@@ -14,7 +14,27 @@
     label { display: block; margin-bottom: 0.5rem; color: white; font-weight: 500; }
     /* 修复：表单内label改为深色，避免白色背景看不清 */
     #shortenerForm label { color: #333; }
-    input, select { width: 100%; padding: 0.75rem; border: none; border-radius: 8px; font-size: 1rem; }
+    /* 核心修改：输入框/下拉框默认显示黑色边框，内容文字黑色，占位符灰色 */
+    input, select { 
+      width: 100%; 
+      padding: 0.75rem; 
+      border: 1px solid #000; /* 关键：默认黑色边框 */
+      border-radius: 8px; 
+      font-size: 1rem; 
+      color: #000; /* 输入内容黑色 */
+      background-color: #fff; /* 背景白色，对比清晰 */
+      outline: none; /* 清除默认选中轮廓（可选，保留也可） */
+    }
+    /* 可选：选中时边框轻微高亮，提升交互感 */
+    input:focus, select:focus {
+      border-color: #667eea; /* 选中时边框变主题色，不想要可改为#000 */
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+    /* 占位符样式优化 */
+    input::placeholder, select::placeholder {
+      color: #666;
+      opacity: 1;
+    }
     .hidden-field { display: none; }
     .hidden-field.show { display: block; }
     #shortenerForm { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
@@ -51,7 +71,7 @@
       </div>
       <div class="form-group">
         <label for="slug">自定义短链标识 (可选)</label>
-        <input type="text" id="slug" placeholder="请输入2~10个字符哦！" maxlength="10">
+        <input type="text" id="slug" placeholder="请输入2~10位字符哦！" maxlength="10">
       </div>
       <div class="checkbox-group">
         <input type="checkbox" id="enablePassword">
