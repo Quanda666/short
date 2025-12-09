@@ -55,6 +55,16 @@
     .result-row:last-child { border-bottom: none; }
     .result-label { font-weight: 500; color: #666; }
     .result-value { font-family: monospace; color: #333; word-break: break-all; }
+    /* 新增：短链接文字可点击样式 */
+    #resultLink { 
+      color: #667eea; 
+      cursor: pointer; 
+      text-decoration: underline; 
+    }
+    #resultLink:hover { 
+      color: #5a67d8; 
+      text-decoration: none; 
+    }
     .copy-btn { background: #48bb78; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin-top: 1rem; width: 100%; }
     .copy-btn:hover { background: #38a169; }
     .copy-btn.copied { background: #2f855a; }
@@ -134,6 +144,16 @@
     const customExpireField = document.getElementById('customExpireField');
     const alertDiv = document.getElementById('alert');
     const resultModal = document.getElementById('resultModal');
+    const resultLink = document.getElementById('resultLink');
+
+    // 新增：短链接点击事件 - 新标签页打开
+    resultLink.addEventListener('click', function() {
+      const link = this.textContent.trim();
+      // 验证是有效URL才打开
+      if (link && link !== '-' && /^https?:\/\//.test(link)) {
+        window.open(link, '_blank');
+      }
+    });
 
     passwordCheckbox.addEventListener('change', () => { passwordField.classList.toggle('show', passwordCheckbox.checked); });
     expireTypeSelect.addEventListener('change', () => { customExpireField.classList.toggle('show', expireTypeSelect.value === 'custom'); });
@@ -178,10 +198,13 @@
       if (show) { loading.style.display = 'inline'; submitText.style.display = 'none'; } else { loading.style.display = 'none'; submitText.style.display = 'inline'; }
     }
 
+    // 复制成功后自动关闭弹窗
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
         const btn = event.target; const original = btn.textContent;
         btn.textContent = '✅ 已复制!'; btn.classList.add('copied');
+        // 关闭结果弹窗
+        resultModal.classList.remove('show');
         setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
       });
     }
