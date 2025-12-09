@@ -195,7 +195,8 @@ export async function onRequestPost(context) {
                 link: `${origin}/${generatedSlug}`,
                 isPasswordProtected: isPasswordProtected === 1,
                 expireType,
-                expireTime: expireTime ? new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai' }).format(new Date(expireTime)) : 'Never'
+                expireTime: expireTime ? new Date(expireTime).toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'}) : 'Never'
+
 
             },
             { headers: corsHeaders, status: 200 }
