@@ -4,40 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>短链生成器</title>
-<style>
-  * { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
-  .container { max-width: 600px; margin: 0 auto; }
-  h1 { text-align: center; color: white; margin-bottom: 2rem; font-size: 2.5rem; }
-  .form-group { margin-bottom: 1.5rem; }
-  label { display: block; margin-bottom: 0.5rem; color: white; font-weight: 500; }
-  
-  /* === 输入框修复：默认黑色文字 === */
-  input, select { 
-    width: 100%; padding: 0.75rem; border: none; border-radius: 8px; 
-    font-size: 1rem; color: black !important; background: white;
-  }
-  input::placeholder { color: #999 !important; }
-  
-  /* 标签文字修复 */
-  label[for="slug"], label[for="customMinutes"] { color: black !important; }
-  
-  .hidden-field { display: none; }
-  .hidden-field.show { display: block; }
-  /* ... 其他样式保持不变 ... */
-</style>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 2rem; /* 仅修改这行背景渐变 */ background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%); min-height: 100vh; }
+    .container { max-width: 600px; margin: 0 auto; }
+    h1 { text-align: center; color: white; margin-bottom: 2rem; font-size: 2.5rem; }
+    .form-group { margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.5rem; color: white; font-weight: 500; }
+    input, select { width: 100%; padding: 0.75rem; border: none; border-radius: 8px; font-size: 1rem; }
+    .hidden-field { display: none; }
+    .hidden-field.show { display: block; }
+    #shortenerForm { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .checkbox-group input[type="checkbox"] { width: auto; }
+    button { width: 100%; padding: 1rem; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: background 0.3s; }
+    button:hover { background: #5a67d8; }
+    button:disabled { background: #a0aec0; cursor: not-allowed; }
+    .loading { display: none; margin-right: 0.5rem; }
+    .alert { position: fixed; top: 2rem; right: 2rem; padding: 1rem 1.5rem; border-radius: 8px; color: white; font-weight: 500; transform: translateX(400px); transition: transform 0.3s; z-index: 1000; }
+    .alert.show { transform: translateX(0); }
+    .alert.success { background: #48bb78; }
+    .alert.error { background: #f56565; }
+    .result-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 2000; align-items: center; justify-content: center; }
+    .result-modal.show { display: flex; }
+    .result-modal > div { background: white; padding: 2.5rem; border-radius: 20px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
+    .result-row { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #eee; }
+    .result-row:last-child { border-bottom: none; }
+    .result-label { font-weight: 500; color: #666; }
+    .result-value { font-family: monospace; color: #333; word-break: break-all; }
+    .copy-btn { background: #48bb78; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin-top: 1rem; width: 100%; }
+    .copy-btn:hover { background: #38a169; }
+    .copy-btn.copied { background: #2f855a; }
+    @media (max-width: 768px) { body { padding: 1rem; } h1 { font-size: 2rem; } }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>🔗 短链生成器</h1>
     <form id="shortenerForm">
       <div class="form-group">
-        <label for="url"style="color: black !important;"> 目标 URL</label>
+        <label for="url">目标 URL</label>
         <input type="url" id="url" placeholder="https://example.com" required>
       </div>
       <div class="form-group">
-        <label for="slug" style="color: black !important;">自定义短链标识</label>
-        <input type="text" id="slug" placeholder="请输入2-10位字符" maxlength="10">
+        <label for="slug">自定义短链标识 (可选)</label>
+        <input type="text" id="slug" placeholder="abcd" maxlength="10">
       </div>
       <div class="checkbox-group">
         <input type="checkbox" id="enablePassword">
@@ -48,7 +59,7 @@
         <input type="password" id="password" placeholder="输入密码">
       </div>
       <div class="form-group">
-        <label for="expireType"style="color: black !important;">⏰ 过期时间</label>
+        <label for="expireType">⏰ 过期时间</label>
         <select id="expireType">
           <option value="never">永不过期</option>
           <option value="hour">1小时</option>
@@ -59,8 +70,8 @@
         </select>
       </div>
       <div id="customExpireField" class="form-group hidden-field">
-        <label for="customMinutes"style="color: black !important;">自定义分钟数</label>
-        <input type="number" id="customMinutes" placeholder="60分钟" min="1">
+        <label for="customMinutes">自定义分钟数</label>
+        <input type="number" id="customMinutes" placeholder="60" min="1">
       </div>
       <button type="submit">
         <span class="loading" id="loading">⏳ 生成中...</span>
