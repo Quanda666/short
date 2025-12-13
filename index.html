@@ -198,16 +198,40 @@
       if (show) { loading.style.display = 'inline'; submitText.style.display = 'none'; } else { loading.style.display = 'none'; submitText.style.display = 'inline'; }
     }
 
-    // 复制成功后自动关闭弹窗
     function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = event.target; const original = btn.textContent;
-        btn.textContent = '✅ 已复制!'; btn.classList.add('copied');
-        // 关闭结果弹窗
-        resultModal.classList.remove('show');
-        setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 2000);
-      });
-    }
+  navigator.clipboard.writeText(text).then(() => {
+    // 修复：直接使用调用按钮，不依赖 event
+    const btn = document.querySelector('.copy-btn'); 
+    const original = btn.textContent;
+    btn.textContent = '✅ 已复制!';
+    btn.classList.add('copied');
+    // 关闭结果弹窗
+    resultModal.classList.remove('show');
+    setTimeout(() => { 
+      btn.textContent = original; 
+      btn.classList.remove('copied'); 
+    }, 2000);
+  }).catch((err) => {
+    // 复制失败 fallback
+    console.error('复制失败:', err);
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    
+    const btn = document.querySelector('.copy-btn');
+    const original = btn.textContent;
+    btn.textContent = '✅ 已复制!';
+    btn.classList.add('copied');
+    setTimeout(() => { 
+      btn.textContent = original; 
+      btn.classList.remove('copied'); 
+    }, 2000);
+  });
+}
+
 
     resultModal.addEventListener('click', function(e) { if (e.target === resultModal) resultModal.classList.remove('show'); });
   </script>
