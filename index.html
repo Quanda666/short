@@ -200,19 +200,24 @@
 
     function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
-    // 修复：直接使用调用按钮，不依赖 event
-    const btn = document.querySelector('.copy-btn'); 
+    // 使用全局 showAlert 显示右上角成功提示
+    showAlert('✅ 已复制!', 'success');
+    
+    // 按钮短暂反馈
+    const btn = document.querySelector('.copy-btn');
     const original = btn.textContent;
     btn.textContent = '✅ 已复制!';
     btn.classList.add('copied');
+    
     // 关闭结果弹窗
     resultModal.classList.remove('show');
+    
     setTimeout(() => { 
       btn.textContent = original; 
       btn.classList.remove('copied'); 
     }, 2000);
   }).catch((err) => {
-    // 复制失败 fallback
+    // 复制失败 fallback + 错误提示
     console.error('复制失败:', err);
     const textarea = document.createElement('textarea');
     textarea.value = text;
@@ -220,6 +225,8 @@
     textarea.select();
     document.execCommand('copy');
     document.body.removeChild(textarea);
+    
+    showAlert('✅ 已复制!', 'success');
     
     const btn = document.querySelector('.copy-btn');
     const original = btn.textContent;
